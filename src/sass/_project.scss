@@ -1,11 +1,13 @@
 .gallery__image {
-    width: 50px;
+    width: 250px;
 }
 
-.thumb {
-    width: 100px;
-}
-
-.info {
-    background-color: black;
+.gallery {
+    margin: auto;
+    max-width: 1200px;
+    display: flex;
+    //justify-content: center;
+    //align-items: center;
+    column-gap: 10px;
+    row-gap: 10px;
 }

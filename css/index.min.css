@@ -1,1 +1,1 @@
-.gallery__image{width:50px}.thumb{width:100px}.info{background-color:#000}/*# sourceMappingURL=index.min.css.map */
+.gallery__image{width:250px}.gallery{margin:auto;max-width:1200px;display:-webkit-box;display:-ms-flexbox;display:flex;-webkit-column-gap:10px;-moz-column-gap:10px;column-gap:10px;row-gap:10px}/*# sourceMappingURL=index.min.css.map */
