@@ -7,8 +7,6 @@ import { createMarkup } from './createMarkup';
 const searchForm = document.querySelector('#search-form');
 const gallery = document.querySelector('.js-gallery');
 const btnLoad = document.querySelector('.js-btn-load');
-btnLoad.hidden = true;
-
 const instance = axios.create({
   baseURL: 'https://pixabay.com/api/',
   params: {
@@ -20,29 +18,62 @@ const instance = axios.create({
     per_page: 40,
   },
 });
+const axiosParams = instance.defaults.params;
+
+btnLoad.hidden = true;
 
 searchForm.addEventListener('submit', onSearchQuery);
+btnLoad.addEventListener('click', onMoreImages);
 
 async function onSearchQuery(e) {
   e.preventDefault();
   gallery.innerHTML = '';
+  console.dir(axiosParams);
   const query = e.target.elements.searchQuery.value.trim();
   if (!query) {
     Notify.info('Please, enter key word for search!');
     return;
   }
-  await instance
-    .request({ params: { q: query } })
+  return await instance
+    .request({ params: { q: query, page: 1 } })
     .then(response => {
-      if (!response.data.hits.length) {
+      const { hits, totalHits } = response.data;
+      btnLoad.hidden = true;
+      if (!hits.length) {
         throw new Error();
       }
-      gallery.insertAdjacentHTML('beforeend', createMarkup(response.data.hits));
-      btnLoad.hidden = false;
+      if (hits.length === axiosParams.per_page) {
+        btnLoad.hidden = false;
+      }
+      gallery.insertAdjacentHTML('beforeend', createMarkup(hits));
+      Notify.success(`Hooray! We found ${totalHits} images.`);
+      new SimpleLightbox('.gallery a');
     })
     .catch(error =>
       Notify.warning(
         'Sorry, there are no images matching your search query. Please try again.'
       )
+    );
+}
+
+async function onMoreImages(e) {
+  e.preventDefault();
+  return await instance
+    .request({
+      params: {
+        page: (axiosParams.page += 1),
+        q: searchForm.elements.searchQuery.value.trim(),
+      },
+    })
+    .then(response => {
+      gallery.insertAdjacentHTML('beforeend', createMarkup(response.data.hits));
+      new SimpleLightbox('.gallery a');
+      if (response.data.hits.length < axiosParams.per_page) {
+        btnLoad.hidden = true;
+        throw new Error();
+      }
+    })
+    .catch(error =>
+      Notify.info("We're sorry, but you've reached the end of search results.")
     );
 }
