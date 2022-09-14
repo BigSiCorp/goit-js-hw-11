@@ -57,7 +57,6 @@ async function onSearchQuery(e) {
 }
 
 async function onMoreImages(e) {
-  e.preventDefault();
   return await instance
     .request({
       params: {
@@ -68,7 +67,8 @@ async function onMoreImages(e) {
     .then(response => {
       gallery.insertAdjacentHTML('beforeend', createMarkup(response.data.hits));
       new SimpleLightbox('.gallery a');
-      if (response.data.hits.length < axiosParams.per_page) {
+      console.log(axiosParams.per_page * axiosParams.page);
+      if (response.data.totalHits <= axiosParams.per_page * axiosParams.page) {
         btnLoad.hidden = true;
         throw new Error();
       }
